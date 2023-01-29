@@ -3,8 +3,8 @@ Simple PoC generator for clickjacking vulnerabilities. Access it at: https://0xl
 It's an early working version, feel free to report any malfunctionings.
 
 ## Motivation
-`clickjackpocgen` was developed to quickly generate customizable clickjacking attacks demos.
-The tool is very straightforward and it's focused on usability instead of functionalities.
+`clickjackpocgen` was developed to quickly generate customizable clickjacking attacks demos.  
+The tool is very straightforward and it's focused on usability instead of functionalities.  
 `clickjackpocgen` was designed to help secuirity professionals or hobbists to generate clickjacking PoCs, it's not suitable to generate "real" weaponized pages.
 
 ## Features
