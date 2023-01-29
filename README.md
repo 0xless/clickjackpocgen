@@ -20,3 +20,5 @@ While it's easy to manually configure the PoC page exported, `clickjackpocgen` f
 ## Usage
 Visit https://0xless.github.io/clickjackpocgen/ and follow the instructions at the bottom of the page.
 
+## License
+This project is licensed under the GPL-3.0 [License](https://github.com/0xless/clickjackpocgen/blob/main/LICENSE).
