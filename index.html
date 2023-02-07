@@ -109,9 +109,10 @@ function clickjack()
 
 	document.onkeydown = intercept_keys;
 
-	/* It would be a constant, but setting it as var 
-	is needed or you get errors on page reloads */ 
-	var adj = 10;
+  
+	//var adj_w = 10;
+  var adj_w = screen.width/100;
+  var adj_h = screen.height/100;
 
 	function intercept_keys(e) 
 	{
@@ -119,34 +120,34 @@ function clickjack()
 	    var pos_top = target.offsetTop;
 
 	    /* Prevents clickjacking area resizing while typing */
-            if (document.activeElement.tagName != "INPUT")
-            {
+      if (document.activeElement.tagName != "INPUT")
+      {
 		    // Modify position
 		    if (e.keyCode == 39) {
-			target.style.left = (parseInt(target.offsetLeft) + adj) + "px";
+			    target.style.left = (parseInt(target.offsetLeft) + adj_w) + "px";
 		    }
 		    else if (e.keyCode == 37) {
-			target.style.left = (parseInt(target.offsetLeft) - adj) + "px";
+			    target.style.left = (parseInt(target.offsetLeft) - adj_w) + "px";
 		    } 
 		    else if (e.keyCode == 38) {
-			target.style.top = (parseInt(target.offsetTop) - adj) + "px";
+			    target.style.top = (parseInt(target.offsetTop) - adj_h) + "px";
 		    } 
 		    else if (e.keyCode == 40) {
-			target.style.top = (parseInt(target.offsetTop) + adj) + "px";
+			    target.style.top = (parseInt(target.offsetTop) + adj_h) + "px";
 		    }
 		    
 		    // Modify size
 		    if (e.keyCode == 87) {
-			target.style.height = (parseInt(target.offsetHeight) - adj) + "px";
+			    target.style.height = (parseInt(target.offsetHeight) - adj_h) + "px";
 		    }
 		    else if (e.keyCode == 83) {
-			target.style.height = (parseInt(target.offsetHeight) + adj) + "px";
+			    target.style.height = (parseInt(target.offsetHeight) + adj_h) + "px";
 		    } 
 		    else if (e.keyCode == 65) {
-			target.style.width = (parseInt(target.offsetWidth) - adj) + "px";
+			    target.style.width = (parseInt(target.offsetWidth) - adj_w) + "px";
 		    } 
 		    else if (e.keyCode == 68) {
-			target.style.width = (parseInt(target.offsetWidth) + adj) + "px";
+			    target.style.width = (parseInt(target.offsetWidth) + adj_w) + "px";
 		    } 
 	    }
 	    
