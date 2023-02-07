@@ -17,6 +17,11 @@ The tool offers some configurable options. It allows:
 
 While it's easy to manually configure the PoC page exported, `clickjackpocgen` focuses on generating PoCs and doesn't support weaponizing pages.
 
+## Known limitations
+The tool allows to draw "clickjacked areas" on the screen in specific positions.
+When resizing the screen, such position is fixed and might end up "outside" of the resized windows.
+There is no easy way to work around this limitation using this approach as target websites will probably be responsive and change the layout of the page depending on the size of the window.
+
 ## Usage
 Visit https://0xless.github.io/clickjackpocgen/ and follow the instructions at the bottom of the page.
 
