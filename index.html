@@ -102,6 +102,7 @@ function clickjack()
 	
 	frame_src_text.value = "https://example.org";
 	page.src = frame_src_text.value;
+  page.setAttribute("sandbox", "allow-forms allow-scripts");
 	
 	alert_text.value = "Clickjacked!";
 	var alert_text_var = alert_text.value;
