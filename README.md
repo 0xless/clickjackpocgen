@@ -10,7 +10,7 @@ The tool is very straightforward and it's focused on usability instead of functi
 ## Features
 The tool offers some configurable options. It allows:
 - To choose the URL to load in the iframe
-- The positioning of the "clickjacked area" using `wasd` and `←↑→↓` buttons
+- The positioning of the "clickjacked area" using mouse interactions, or `wasd` and `←↑→↓` buttons
 - Personalizing the text on the "clickjacked area" during the configuration (to capture screenshots)
 - Exporting a PoC page with invisible "clickjacked area"
 - Personalizing alert text triggered on "clickjacked area" click
