@@ -27,18 +27,37 @@
     padding: 0px;
   }
     
-  #target {
+  #target_div {
     position: absolute;
-    width: 100px;
-    height: 100px;
     top: 10%;
     left: 10%;
+    border: 0px;
+    opacity: 1;
+    width: 100px;
+    height: 100px;
+    resize: both;
+    overflow:hidden;
+  }
+
+  #target {
+    width: 100%;
+    height: 100%;
     background: red;
     color: white;
     opacity: 0.7;
     border: 0px;
   }
   
+  #dd_area{
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    position: absolute;
+    left: -20px;
+    top: 0px;
+    z-index: 1;
+  }
+
   #navbar {
     background-color: #444;
     overflow: hidden;
@@ -86,14 +105,15 @@
 
 </style>
 
+
 <script>
 // Makes sure body element exists before executing the function
 document.onreadystatechange = function () {
   if (document.readyState == "complete") {
     clickjack();
+    dragElement(document.getElementById("dd_area"));
   }
 }
-
 
 function clickjack() 
 {
@@ -110,45 +130,43 @@ function clickjack()
 
 	document.onkeydown = intercept_keys;
 
-  
-	//var adj_w = 10;
   var adj_w = screen.width/100;
   var adj_h = screen.height/100;
 
 	function intercept_keys(e) 
 	{
-	    var pos_left = target.offsetLeft;
-	    var pos_top = target.offsetTop;
+	    var pos_left = target_div.offsetLeft;
+	    var pos_top = target_div.offsetTop;
 
 	    /* Prevents clickjacking area resizing while typing */
       if (document.activeElement.tagName != "INPUT")
       {
 		    // Modify position
 		    if (e.keyCode == 39) {
-			    target.style.left = (parseInt(target.offsetLeft) + adj_w) + "px";
+			    target_div.style.left = (parseInt(target_div.offsetLeft) + adj_w) + "px";
 		    }
 		    else if (e.keyCode == 37) {
-			    target.style.left = (parseInt(target.offsetLeft) - adj_w) + "px";
+			    target_div.style.left = (parseInt(target_div.offsetLeft) - adj_w) + "px";
 		    } 
 		    else if (e.keyCode == 38) {
-			    target.style.top = (parseInt(target.offsetTop) - adj_h) + "px";
+			    target_div.style.top = (parseInt(target_div.offsetTop) - adj_h) + "px";
 		    } 
 		    else if (e.keyCode == 40) {
-			    target.style.top = (parseInt(target.offsetTop) + adj_h) + "px";
+			    target_div.style.top = (parseInt(target_div.offsetTop) + adj_h) + "px";
 		    }
 		    
 		    // Modify size
 		    if (e.keyCode == 87) {
-			    target.style.height = (parseInt(target.offsetHeight) - adj_h) + "px";
+			    target_div.style.height = (parseInt(target_div.offsetHeight) - adj_h) + "px";
 		    }
 		    else if (e.keyCode == 83) {
-			    target.style.height = (parseInt(target.offsetHeight) + adj_h) + "px";
+			    target_div.style.height = (parseInt(target_div.offsetHeight) + adj_h) + "px";
 		    } 
 		    else if (e.keyCode == 65) {
-			    target.style.width = (parseInt(target.offsetWidth) - adj_w) + "px";
+			    target_div.style.width = (parseInt(target_div.offsetWidth) - adj_w) + "px";
 		    } 
 		    else if (e.keyCode == 68) {
-			    target.style.width = (parseInt(target.offsetWidth) + adj_w) + "px";
+			    target_div.style.width = (parseInt(target_div.offsetWidth) + adj_w) + "px";
 		    } 
 	    }
 	    
@@ -180,13 +198,12 @@ function clickjack()
 			alert_text_var = alert_text.value;
 			target.setAttribute("onclick", `alert('${alert_text_var}');`);
 		}
-            }
+    }
 	}
 }
 
 function export_poc()
 {
-	
 	// Creates a copy of the DOM with the positioned clickjack area
 	var orig_content = document.documentElement.innerHTML;
 	var dom_copy = _create_dom_clone(orig_content);
@@ -223,13 +240,57 @@ function _create_dom_clone(htmlcode)
 	return doc
 }
 
-</script>
+function dragElement(elmnt) {
+  console.log("drag")
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  elmnt.onmousedown = dragMouseDown;
+  elmnt = target_div;
+
+  function dragMouseDown(e) {
+    console.log("mouse down");
+    e = e || window.event;
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    console.log("element drag");
+    e = e || window.event;
+    e.preventDefault();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+  }
+
+  function closeDragElement() {
+    console.log("close element drag");
+    /* stop moving when mouse button is released:*/
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+}
+
+</script>  
+
 </head>
 
 <body>
 <iframe id="page" frameBorder=0></iframe>
 
-<button type="button" id="target" onclick=""></button>
+<div id="target_div">
+  <div id="dd_area"></div>
+  <button type="button" id="target" onclick=""></button>
+</div>
 
 <div id="navbar" class="container-fluid">
   <div style="width: 100%">
@@ -241,7 +302,8 @@ function _create_dom_clone(htmlcode)
         Press <kbd>WASD</kbd> keys to adjust clickjacking area size, <br>
         Press <kbd>←↑→↓</kbd> keys to adjust its position, <br>
         Press <kbd>esc</kbd> key to toggle this navbar, <br>
-        Press <kbd>enter</kbd> key to update input data
+        Press <kbd>enter</kbd> key to update input data, <br>
+        Or use mouse to adjust clickjacking area size and position.
       </p>
     </div>
     <div class="col-md-3 paddme">
