@@ -127,6 +127,9 @@ function clickjack()
 	alert_text.value = "Clickjacked!";
 	var alert_text_var = alert_text.value;
 	target.setAttribute("onclick", `alert('${alert_text_var}');`);
+  dd_area.setAttribute("onclick", `alert('${alert_text_var}');`);
+  
+  //target_div.setAttribute("onclick", `alert('${alert_text_var}');`);
 
 	document.onkeydown = intercept_keys;
 
