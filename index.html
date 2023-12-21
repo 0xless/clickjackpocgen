@@ -116,94 +116,102 @@ document.onreadystatechange = function () {
   }
 }
 
+var alert_text_var = "";
+
+aus_func = function(){
+	alert_text_var = alert_text.value;
+  if(click_flag)alert(alert_text_var);
+  click_flag = true;
+}
+
 function clickjack() 
 {
 	button_text.value = "Malicious Action";
 	target.textContent = button_text.value;
+  alert_text.value = "Clickjacked!";
 	
 	frame_src_text.value = "https://example.org";
 	page.src = frame_src_text.value;
   page.setAttribute("sandbox", "allow-forms allow-scripts");
 	
-	alert_text.value = "Clickjacked!";
-	var alert_text_var = alert_text.value;
-	target.setAttribute("onclick", `alert('${alert_text_var}');`);
-  dd_area.setAttribute("onclick", `alert('${alert_text_var}');`);
-  
-  //target_div.setAttribute("onclick", `alert('${alert_text_var}');`);
+	target.setAttribute("onclick", `aus_func()`);
+  dd_area.setAttribute("onclick", `aus_func()`);
 
 	document.onkeydown = intercept_keys;
 
   var adj_w = screen.width/100;
   var adj_h = screen.height/100;
+}
 
-	function intercept_keys(e) 
-	{
-	    var pos_left = target_div.offsetLeft;
-	    var pos_top = target_div.offsetTop;
+var alert_export_text = alert_text_var;
 
-	    /* Prevents clickjacking area resizing while typing */
-      if (document.activeElement.tagName != "INPUT")
-      {
-		    // Modify position
-		    if (e.keyCode == 39) {
-			    target_div.style.left = (parseInt(target_div.offsetLeft) + adj_w) + "px";
-		    }
-		    else if (e.keyCode == 37) {
-			    target_div.style.left = (parseInt(target_div.offsetLeft) - adj_w) + "px";
-		    } 
-		    else if (e.keyCode == 38) {
-			    target_div.style.top = (parseInt(target_div.offsetTop) - adj_h) + "px";
-		    } 
-		    else if (e.keyCode == 40) {
-			    target_div.style.top = (parseInt(target_div.offsetTop) + adj_h) + "px";
-		    }
-		    
-		    // Modify size
-		    if (e.keyCode == 87) {
-			    target_div.style.height = (parseInt(target_div.offsetHeight) - adj_h) + "px";
-		    }
-		    else if (e.keyCode == 83) {
-			    target_div.style.height = (parseInt(target_div.offsetHeight) + adj_h) + "px";
-		    } 
-		    else if (e.keyCode == 65) {
-			    target_div.style.width = (parseInt(target_div.offsetWidth) - adj_w) + "px";
-		    } 
-		    else if (e.keyCode == 68) {
-			    target_div.style.width = (parseInt(target_div.offsetWidth) + adj_w) + "px";
-		    } 
-	    }
-	    
-	    // Manage navbar toggling
-	    if (e.keyCode == 27) {
-	    	if (navbar.style.display == "none")
-	    	{
-	    		navbar.style.display = "flex";
-	    	}
-	    	else
-	    	{
-			navbar.style.display = "none";
-	    	}
-	    }
-	    
-	    if (event.keyCode == 13) {
-         	if (target.textContent != button_text.value) 
-		{
-			target.textContent = button_text.value;
-		}
-		
-		if (page.src != frame_src_text.value) 
-		{
-			page.src = frame_src_text.value;
-		}
-		
-		if (alert_text_var != alert_text.value) 
-		{
-			alert_text_var = alert_text.value;
-			target.setAttribute("onclick", `alert('${alert_text_var}');`);
-		}
+function intercept_keys(e) 
+{
+    var pos_left = target_div.offsetLeft;
+    var pos_top = target_div.offsetTop;
+
+    /* Prevents clickjacking area resizing while typing */
+    if (document.activeElement.tagName != "INPUT")
+    {
+      // Modify position
+      if (e.keyCode == 39) {
+        target_div.style.left = (parseInt(target_div.offsetLeft) + adj_w) + "px";
+      }
+      else if (e.keyCode == 37) {
+        target_div.style.left = (parseInt(target_div.offsetLeft) - adj_w) + "px";
+      } 
+      else if (e.keyCode == 38) {
+        target_div.style.top = (parseInt(target_div.offsetTop) - adj_h) + "px";
+      } 
+      else if (e.keyCode == 40) {
+        target_div.style.top = (parseInt(target_div.offsetTop) + adj_h) + "px";
+      }
+      
+      // Modify size
+      if (e.keyCode == 87) {
+        target_div.style.height = (parseInt(target_div.offsetHeight) - adj_h) + "px";
+      }
+      else if (e.keyCode == 83) {
+        target_div.style.height = (parseInt(target_div.offsetHeight) + adj_h) + "px";
+      } 
+      else if (e.keyCode == 65) {
+        target_div.style.width = (parseInt(target_div.offsetWidth) - adj_w) + "px";
+      } 
+      else if (e.keyCode == 68) {
+        target_div.style.width = (parseInt(target_div.offsetWidth) + adj_w) + "px";
+      } 
     }
-	}
+    
+    // Manage navbar toggling
+    if (e.keyCode == 27) {
+      if (navbar.style.display == "none")
+      {
+        navbar.style.display = "flex";
+      }
+      else
+      {
+        navbar.style.display = "none";
+      }
+    }
+    
+    if (event.keyCode == 13) {
+        if (target.textContent != button_text.value) 
+  {
+    target.textContent = button_text.value;
+  }
+  
+  if (page.src != frame_src_text.value) 
+  {
+    page.src = frame_src_text.value;
+  }
+  
+  if (alert_text_var != alert_text.value) 
+  {
+    alert_text_var = alert_text.value;
+    target.setAttribute("onclick", `aus_func()`);
+    dd_area.setAttribute("onclick", `aus_func()`);
+  }
+  }
 }
 
 function export_poc()
@@ -223,9 +231,11 @@ function export_poc()
 
 	// Removes unnecessary elements
 	dom_copy.getElementById("navbar").remove();
-	dom_copy.getElementsByTagName("script")[0].remove()
+	//dom_copy.getElementsByTagName("script")[0].remove()
   dom_copy.getElementById("dd_area").remove();
   dom_copy.getElementById("target_div").style.resize="none";
+  dom_copy.getElementById("target_div").onclick="none";
+  dom_copy.getElementById("target").setAttribute("onclick", `alert('${alert_text_var}');`)
 
 	// Sets up a dummy download button and clicks it to export the PoC
 	var bl = new File([dom_copy.documentElement.innerHTML], {type: "text/html"});
@@ -246,44 +256,49 @@ function _create_dom_clone(htmlcode)
 	return doc
 }
 
-function dragElement(elmnt) {
-  console.log("drag")
+var delta = 2;
+var click_flag = true;
+
+function dragElement(elmnt) 
+{
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
   elmnt.onmousedown = dragMouseDown;
+  click_flag = true;
   elmnt = target_div;
 
-  function dragMouseDown(e) {
-    console.log("mouse down");
-    e = e || window.event;
-    e.preventDefault();
-    // get the mouse cursor position at startup:
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    document.onmouseup = closeDragElement;
-    // call a function whenever the cursor moves:
-    document.onmousemove = elementDrag;
-  }
+function dragMouseDown(e) {
+  e = e || window.event;
+  e.preventDefault();
+  // get the mouse cursor position at startup:
+  pos3 = e.clientX;
+  pos4 = e.clientY;
+  document.onmouseup = closeDragElement;
+  // call a function whenever the cursor moves:
+  document.onmousemove = elementDrag;
+}
 
-  function elementDrag(e) {
-    console.log("element drag");
-    e = e || window.event;
-    e.preventDefault();
-    // calculate the new cursor position:
-    pos1 = pos3 - e.clientX;
-    pos2 = pos4 - e.clientY;
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    // set the element's new position:
-    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-  }
+function elementDrag(e) {
+  e = e || window.event;
+  e.preventDefault();
+  // calculate the new cursor position:
+  pos1 = pos3 - e.clientX;
+  pos2 = pos4 - e.clientY;
+  pos3 = e.clientX;
+  pos4 = e.clientY;
 
-  function closeDragElement() {
-    console.log("close element drag");
-    /* stop moving when mouse button is released:*/
-    document.onmouseup = null;
-    document.onmousemove = null;
+  // check if element has been dragged and disable onclick action
+  if(Math.abs(pos1) > delta || Math.abs(pos2) > delta){
+    click_flag = false
   }
+  // set the element's new position:
+  elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+  elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+}
+function closeDragElement() {
+  /* stop moving when mouse button is released:*/
+  document.onmouseup = null;
+  document.onmousemove = null;
+}
 }
 
 </script>  
