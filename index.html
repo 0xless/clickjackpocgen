@@ -223,6 +223,8 @@ function export_poc()
 	// Removes unnecessary elements
 	dom_copy.getElementById("navbar").remove();
 	dom_copy.getElementsByTagName("script")[0].remove()
+  dom_copy.getElementById("dd_area").remove();
+  dom_copy.getElementById("target_div").style.resize="none";
 
 	// Sets up a dummy download button and clicks it to export the PoC
 	var bl = new File([dom_copy.documentElement.innerHTML], {type: "text/html"});
